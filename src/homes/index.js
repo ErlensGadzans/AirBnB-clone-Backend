@@ -28,7 +28,7 @@ const readFile = async () => {
 const writeFile = async (content) =>
   await fs.writeFile(homesFilePath, JSON.stringify(content));
 
-// get all homes
+// GET all homes
 router.get("/", async (req, res, next) => {
   res.send(await readFile());
 });
@@ -52,7 +52,21 @@ router.post("/", cloudMulter.single("cover"), async (req, res, next) => {
     next(error);
   }
 });
-// edit homes
-// delete homes
+// EDIT homes
+
+// DELETE homes
+
+router.delete("/:id", async (req, res, next) => {
+  const currentHomesList = await readFile();
+  const remainingHomesList = currentHomesList.filter(
+    (home) => home.id !== req.params.id
+  );
+  if (remainingHomesList.length === currentHomesList.length) {
+    const error = new Error("Cannot find home" + req.params.id);
+    next(error);
+  }
+  await writeFile(remainingHomesList);
+  res.send("Home is deleted");
+});
 
 module.exports = router;
