@@ -1,6 +1,19 @@
 const express = require("express");
 const fs = require("fs-extra");
 const path = require("path");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+const cloudStorage = new CloudinaryStorage({
+  //instant of storage
+  cloudinary: cloudinary, //credential, akreditācija, polnomochija
+  params: {
+    folder: "homes",
+  },
+});
+
+const cloudMulter = multer({ storage: cloudStorage }); //cloudinary version of Multer
 
 const router = express.Router();
 const homesFilePath = path.join(__dirname, "homes.json"); //receiving files from fake or hardcoded database
@@ -19,6 +32,19 @@ router.get("/", async (req, res, next) => {
   res.send(await readFile());
 });
 // create new apatment - have to use Cloudinary to upload images
+router.post("/", cloudMulter.single("cover"), async (req, res, next) => {
+  try {
+    //Add place with address , title , description, price , rooms info , house facilities
+    // Address must be an object contains , street , city ,zip code , country , latitude , longitude
+    // Show location with google maps iframe in details page.
+    // Title and description must be string and cant be empty.
+
+    res.send(req.file.path);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 // edit homes
 // delete homes
 

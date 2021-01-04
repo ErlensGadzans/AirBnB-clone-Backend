@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config(); // telling to read .env file
 const listEndpoints = require("express-list-endpoints");
 
 const homesRouter = require("./homes");
