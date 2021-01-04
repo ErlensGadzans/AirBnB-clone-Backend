@@ -53,9 +53,38 @@ router.post("/", cloudMulter.single("cover"), async (req, res, next) => {
   }
 });
 // EDIT homes
+router.put("/:id", async (req, res, next) => {
+  try {
+    const currentHomesList = await readFile();
+    const remainingHomesList = currentHomesList.filter(
+      (home) => home.id !== req.params.id
+    );
+    const updateHome = currentHomesList.find(
+      (home) => home.id === req.params.id
+    ); //indetify home, which will be edited
+    if (!updateHome) {
+      //if Home does not exist, then error
+      const error = new Error("Cannot find home" + req.params.id);
+      next(error);
+    }
+    delete req.body.id; // user cannot touch or change this field
+
+    await writeFile([
+      //sticking old element to newOne
+      ...remainingHomesList,
+      {
+        ...updateHome,
+        ...req.body,
+      },
+    ]);
+
+    res.send(req.params.id);
+  } catch (error) {
+    next(error);
+  }
+});
 
 // DELETE homes
-
 router.delete("/:id", async (req, res, next) => {
   const currentHomesList = await readFile();
   const remainingHomesList = currentHomesList.filter(
