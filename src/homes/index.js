@@ -4,6 +4,7 @@ const path = require("path");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const uniqid = require("uniqid");
 
 const cloudStorage = new CloudinaryStorage({
   //instant of storage
@@ -38,8 +39,14 @@ router.post("/", cloudMulter.single("cover"), async (req, res, next) => {
     // Address must be an object contains , street , city ,zip code , country , latitude , longitude
     // Show location with google maps iframe in details page.
     // Title and description must be string and cant be empty.
+    const newHome = JSON.parse(req.body.home); //reading the body from requested body name
+    newHome.image = req.file.path; //put the image from cloudinary
+    newHome.id = uniqid();
 
-    res.send(req.file.path);
+    const currentHomes = await readFile(); //reading files from json file
+    await writeFile([...currentHomes, newHome]); // creating array with previous Home & pushing newHome details
+
+    res.status(201).send(newHome.id);
   } catch (error) {
     console.log(error);
     next(error);
