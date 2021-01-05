@@ -2,6 +2,14 @@ const express = require("express");
 require("dotenv").config(); // telling to read .env file
 const listEndpoints = require("express-list-endpoints");
 
+const {
+  notFoundHandler,
+  notAuthorizedHandler,
+  forbiddenHandler,
+  badRequestHandler,
+  catchAllHandlers,
+} = require("./errorHandling");
+
 const homesRouter = require("./homes");
 
 const server = express();
@@ -14,5 +22,11 @@ server.use("/homes", homesRouter);
 const port = process.env.PORT || 3001;
 
 console.log(listEndpoints(server));
+
+server.use(notFoundHandler);
+server.use(notAuthorizedHandler);
+server.use(forbiddenHandler);
+server.use(badRequestHandler);
+server.use(catchAllHandlers);
 
 server.listen(port, () => console.log("Server is running on port" + port));
