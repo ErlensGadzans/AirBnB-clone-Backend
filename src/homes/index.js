@@ -98,4 +98,41 @@ router.delete("/:id", async (req, res, next) => {
   res.send("Home is deleted");
 });
 
+// ADD homes reviews
+router.post("/:id/reviews", async (req, res, next) => {
+  const currentHomesList = await readFile(); //receiving list of homes
+  const singleHome = currentHomesList.find(
+    //identifying single home
+    (home) => home.id === home.params.id
+  );
+});
+
+// GET homes reviews
+
+router.get("/:id/reviews"),
+  async (req, res, next) => {
+    try {
+      const currentHomesList = await readFile(); //receiving list of homes
+      const singleHome = currentHomesList.find(
+        //identifying single home
+        (home) => home.id === home.params.id
+      );
+      if (singleHome) {
+        if (singleHome.hasOwnProperty("reviews")) {
+          res.send(singleHome.reviews);
+        } else {
+          res.send("This home has no reviews!");
+        }
+      } else {
+        console.log(err);
+        next(err);
+      }
+    } catch (err) {
+      next(err);
+    }
+  };
+
+// EDIT home reviews
+// DELETE home reviews
+
 module.exports = router;
