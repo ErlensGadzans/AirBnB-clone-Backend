@@ -11,6 +11,7 @@ const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary, //credential, akreditācija, polnomochija
   params: {
     folder: "homes",
+    folder: "reviews",
   },
 });
 
@@ -100,11 +101,40 @@ router.delete("/:id", async (req, res, next) => {
 
 // ADD homes reviews
 router.post("/:id/reviews", async (req, res, next) => {
-  const currentHomesList = await readFile(); //receiving list of homes
-  const singleHome = currentHomesList.find(
-    //identifying single home
-    (home) => home.id === home.params.id
-  );
+  try {
+    const currentHomesList = await readFile(); //receiving list of homes
+    const singleHomeIndex = currentHomesList.findIndex(
+      //identifying single home review
+      (home) => home.id === req.params.id
+    );
+    if (singleHomeIndex !== -1) {
+      if (currentHomesList[singleHomeIndex].hasOwnProperty("reviews")) {
+        //if there is selected home
+        currentHomesList[singleHomeIndex].reviews.push({
+          ...req.body, //requesting body
+          id: uniqid(), //gives uniqid to review
+          createdAd: new Date(), //adding date, when review has been created
+        });
+      } else {
+        currentHomesList[singleHomeIndex].reviews = [
+          {
+            ...req.body,
+            elementId: req.params.currentHomesList,
+            createdAd: new Date(),
+          },
+        ];
+      }
+      await writeFile(currentHomesList);
+      res.send("Review has been added!");
+    } else {
+      const err = new Error();
+      err.httpStatuscode = 404;
+      next(err);
+    }
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
 });
 
 // GET homes reviews
@@ -119,6 +149,7 @@ router.get("/:id/reviews"),
       );
       if (singleHome) {
         if (singleHome.hasOwnProperty("reviews")) {
+          //if particular home will have a review, then display it
           res.send(singleHome.reviews);
         } else {
           res.send("This home has no reviews!");
