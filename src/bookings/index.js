@@ -33,6 +33,16 @@ router.post("/:id", async (req, res, next) => {
       const error = new Error("There is no home" + req.params.id);
       err.httpStatuscode = 404;
       next(error);
+    }
+    const selectedBooking = await readFile(bookingFilePath);
+    const selectedHomeisAlreadyAddedtoBookinglist = selectedBooking.find(
+      (booking) => booking.id === req.params.id
+    );
+    if (selectedHomeisAlreadyAddedtoBookinglist) {
+      const error = new Error();
+      error.httpStatuscode = 400;
+      res.send("This home is already added!");
+      next(error);
     } else {
       const currentBooking = await readFile(bookingFilePath);
       await writeFile([...currentBooking, currentHome]);
