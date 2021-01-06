@@ -46,4 +46,16 @@ router.post("/:id", async (req, res, next) => {
 
 // REMOVE OR DELETE BOOKING
 
+router.delete("/:id", async (req, res, next) => {
+  // 1) get all bookings from the list
+  // 2) take specified booking out
+  // 3) rewrite list of bookings
+  const bookingList = await readFile(bookingFilePath);
+  const selectedBooking = await bookingList.filter(
+    (booking) => booking.id !== req.params.id
+  );
+  await writeFile(selectedBooking);
+  res.status(200).send("Booking has been deleted.");
+});
+
 module.exports = router;
