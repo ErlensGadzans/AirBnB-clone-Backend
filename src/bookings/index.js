@@ -1,8 +1,8 @@
 const express = require("express");
-
 const path = require("path");
 const fs = require("fs-extra");
 const { finished } = require("stream");
+const { Transform } = require("json2csv");
 
 const router = express.Router();
 
@@ -17,6 +17,16 @@ const readFile = async (path) => {
 
 const writeFile = async (content) =>
   await fs.writeFile(bookingFilePath, JSON.stringify(content));
+
+//CSV EXPORT
+
+router.get("/csv/export", async (req, res, next) => {
+  // SOURCE json file
+  const source = fs.createReadStream(bookingFilePath);
+  // TRANSFORM json2csv
+  const transformStream = new Transform({ fields: ["title", "adress"] });
+  // DESTINATION UPLOAD to client
+});
 
 // GET BOOKINGS
 router.get("/", async (req, res, next) => {
