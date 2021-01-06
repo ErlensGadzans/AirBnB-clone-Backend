@@ -11,6 +11,7 @@ const {
 } = require("./errorHandling");
 
 const homesRouter = require("./homes");
+const bookingsRouter = require("./bookings");
 
 const server = express();
 
@@ -18,6 +19,7 @@ server.use(express.json());
 
 server.get("/", (req, res, next) => res.send("Server is running"));
 server.use("/homes", homesRouter);
+server.use("/bookings", bookingsRouter);
 
 const port = process.env.PORT || 3001;
 
