@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs-extra");
 const { finished } = require("stream");
 const { Transform } = require("json2csv");
+const { pipeline } = require("stream");
 
 const router = express.Router();
 
@@ -24,8 +25,28 @@ router.get("/csv/export", async (req, res, next) => {
   // SOURCE json file
   const source = fs.createReadStream(bookingFilePath);
   // TRANSFORM json2csv
-  const transformStream = new Transform({ fields: ["title", "adress"] });
-  // DESTINATION UPLOAD to client
+  const transformJsonintoCsv = new Transform({
+    fields: [
+      "title",
+      "address",
+      "description",
+      "price",
+      "rooms",
+      "facilities",
+      "image",
+    ],
+  });
+
+  res.setHeader("Content-Disposition", "attachment; filename=export.csv"); // creatin permition "save on disk" window, to open in brower
+
+  // DESTINATION UPLOAD to client - response object
+  pipeline(source, transformJsonintoCsv, res, (err) => {
+    if (err) {
+      next(err);
+    } else {
+      console.log("Json file is transformed to csv file!");
+    }
+  });
 });
 
 // GET BOOKINGS
