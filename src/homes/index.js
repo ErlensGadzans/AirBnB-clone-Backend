@@ -112,7 +112,7 @@ router.post("/:id/reviews", async (req, res, next) => {
         //if there is selected home
         currentHomesList[singleHomeIndex].reviews.push({
           ...req.body, //requesting body
-          id: uniqid(), //gives uniqid to review
+          _id: uniqid(), //gives uniqid to review
           createdAd: new Date(), //adding date, when review has been created
         });
       } else {
@@ -164,6 +164,36 @@ router.get("/:id/reviews"),
   };
 
 // EDIT home reviews
+
+router.put("/:id/reviews/:reviewID", async (req, res, next) => {
+  try {
+    const currentHomesList = await readFile();
+    const singleHomeIndex = currentHomesList.findIndex(
+      (home) => home.id === req.params.id
+    );
+
+    if (singleHomeIndex !== -1) {
+      const currentReview = currentHomesList[singleHomeIndex].reviews.findIndex(
+        (review) => review._id === req.params.reviewID
+      );
+
+      currentHomesList[singleHomeIndex].reviews[currentReview] = {
+        ...currentHomesList[singleHomeIndex].reviews[currentReview], //spredoperator dont really understand it, but trying to remember
+        ...req.body,
+        updatedAd: new Date(),
+      };
+      await writeFile(currentHomesList);
+      res.send("Review has been edited!");
+    } else {
+      const error = new Error();
+      next(error);
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 // DELETE home reviews
 
 router.delete("/:id/reviews/:reviewID", async (req, res, next) => {
