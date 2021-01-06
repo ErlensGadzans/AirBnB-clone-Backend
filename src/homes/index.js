@@ -166,4 +166,29 @@ router.get("/:id/reviews"),
 // EDIT home reviews
 // DELETE home reviews
 
+router.delete("/:id/reviews/:reviewID", async (req, res, next) => {
+  try {
+    const currentHomesList = await readFile(); //receiving list of homes
+    const singleHomeIndex = currentHomesList.findIndex(
+      //identifying single home review
+      (home) => home.id === req.params.id
+    );
+
+    if (singleHomeIndex !== -1) {
+      const currentReview = currentHomesList[singleHomeIndex].reviews.find(
+        (review) => review.id !== req.params.reviewID
+      );
+      currentHomesList[singleHomeIndex].reviews = currentReview;
+      await writeFile(currentHomesList);
+      res.send("Review is deleted!");
+    } else {
+      const error = new Error(); //i dont really understand in which case do we need to write "err" or "error", or it does not matter
+      next(error);
+    }
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
 module.exports = router;
